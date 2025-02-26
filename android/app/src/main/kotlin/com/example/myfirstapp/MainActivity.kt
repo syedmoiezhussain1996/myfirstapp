@@ -18,19 +18,23 @@ class MainActivity : FlutterActivity() {
         MyDeviceAdminReceiver.methodChannel = methodChannel // Set the channel for the receiver
 
         methodChannel.setMethodCallHandler { call, result ->
-            val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            val devicePolicyManager =
+                    getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
             val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
 
             when (call.method) {
                 "activateDeviceAdmin" -> {
-                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
-                        putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
-                        putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Enable device admin to protect your data")
-                    }
+                    val intent =
+                            Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                                putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName)
+                                putExtra(
+                                        DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                                        "Enable device admin to protect your data"
+                                )
+                            }
                     startActivity(intent)
                     result.success("Device Admin Activation Started")
                 }
-
                 "deactivateDeviceAdmin" -> {
                     if (devicePolicyManager.isAdminActive(componentName)) {
                         devicePolicyManager.removeActiveAdmin(componentName)
@@ -39,12 +43,10 @@ class MainActivity : FlutterActivity() {
                         result.error("NOT_ADMIN", "Device Admin is not active", null)
                     }
                 }
-
                 "isDeviceAdminActive" -> {
                     val isActive = devicePolicyManager.isAdminActive(componentName)
                     result.success(isActive)
                 }
-
                 else -> result.notImplemented()
             }
         }
